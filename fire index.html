@@ -1,56 +1,128 @@
-Firewall
 <!DOCTYPE html><html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Online Store</title>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-storage.js"></script>
-    <style>
-        body { font-family: Arial, sans-serif; text-align: center; }
-        header { background: #333; color: white; padding: 15px; display: flex; justify-content: space-between; align-items: center; position: relative; }
-        .menu { position: relative; }
-        .menu-button { background: transparent; border: none; color: white; font-size: 24px; cursor: pointer; }
-        .menu-content { display: none; position: absolute; top: 30px; right: 0; background: white; border: 1px solid #ccc; padding: 10px; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); }
-        .menu-content button { display: block; background: none; border: none; padding: 10px; text-align: left; width: 100%; cursor: pointer; }
-        .menu-content button:hover { background: #f0f0f0; }
-        .product-container { display: flex; flex-wrap: wrap; justify-content: center; padding: 20px; }
-        .product { border: 1px solid #ddd; margin: 10px; padding: 15px; width: 200px; }
-        .product img { width: 100%; height: auto; }
-        .admin-panel, .staff-panel, .orders-panel { display: none; padding: 20px; border: 1px solid #ccc; }
-    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Online Store</title>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-storage.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; }
+        header { background: #333; color: white; padding: 15px; display: flex; justify-content: space-between; align-items: center; position: relative; }
+        .menu { position: relative; }
+        .menu-button { background: transparent; border: none; color: white; font-size: 24px; cursor: pointer; }
+        .menu-content { display: none; position: absolute; top: 30px; right: 0; background: white; border: 1px solid #ccc; padding: 10px; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); }
+        .menu-content button { display: block; background: none; border: none; padding: 10px; text-align: left; width: 100%; cursor: pointer; }
+        .menu-content button:hover { background: #f0f0f0; }
+        .product-container { display: flex; flex-wrap: wrap; justify-content: center; padding: 20px; }
+        .product { border: 1px solid #ddd; margin: 10px; padding: 15px; width: 200px; }
+        .product img { width: 100%; height: auto; }
+        .admin-panel, .staff-panel, .orders-panel { display: none; padding: 20px; border: 1px solid #ccc; }
+    </style>
 </head>
 <body>
-    <header>
-        My Online Store
-        <div class="menu">
-            <button class="menu-button" onclick="toggleMenu()">\u22EE</button>
-            <div class="menu-content" id="menuContent">
-                <button onclick="showAdminLogin()">Admin Login</button>
-                <button onclick="showStaffLogin()">Staff Login</button>
-            </div>
-        </div>
-    </header>
-    <div id="products" class="product-container"></div><script>
-    const firebaseConfig = {
-        apiKey: "AIzaSyCFJj-WJ0bGgQb6IQuWKCgzE3hUZrlJ5zo",
-        authDomain: "online-store-4d840.firebaseapp.com",
-        projectId: "online-store-4d840",
-        storageBucket: "online-store-4d840.appspot.com",
-        messagingSenderId: "231128579838",
-        appId: "1:231128579838:android:445fef9a59d10dd01bafaf"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
-    const auth = firebase.auth();
-    const storage = firebase.storage();
+    <header>
+        My Online Store
+        <div class="menu">
+            <button class="menu-button" onclick="toggleMenu()">⋮</button>
+            <div class="menu-content" id="menuContent">
+                <button onclick="showAdminLogin()">Admin Login</button>
+                <button onclick="showStaffLogin()">Staff Login</button>
+            </div>
+        </div>
+    </header><div id="products" class="product-container"></div>
 
-    function toggleMenu() {
-        let menu = document.getElementById("menuContent");
-        menu.style.display = menu.style.display === "block" ? "none" : "block";
-    }
+<div class="staff-panel" id="staffPanel">
+    <h2>Manage Products</h2>
+    <input type="text" id="productName" placeholder="Product Name">
+    <input type="number" id="productPrice" placeholder="Price">
+    <input type="text" id="productCategory" placeholder="Category">
+    <input type="file" id="productImage">
+    <button onclick="addProduct()">Add Product</button>
+    <h2>Orders</h2>
+    <div id="orderList"></div>
+    <button onclick="hideStaffPanel()">Close</button>
+</div>
+
+<script>
+    const firebaseConfig = {
+        apiKey: "YOUR_API_KEY",
+        authDomain: "YOUR_AUTH_DOMAIN",
+        projectId: "YOUR_PROJECT_ID",
+        storageBucket: "YOUR_STORAGE_BUCKET",
+        messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+        appId: "YOUR_APP_ID"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const auth = firebase.auth();
+    const storage = firebase.storage();
+
+    function toggleMenu() {
+        let menu = document.getElementById("menuContent");
+        menu.style.display = menu.style.display === "block" ? "none" : "block";
+    }
+
+    function showStaffLogin() {
+        let email = prompt("Enter Email:");
+        let password = prompt("Enter Password:");
+        auth.signInWithEmailAndPassword(email, password).then(user => {
+            document.getElementById("staffPanel").style.display = "block";
+            loadProducts();
+            loadOrders();
+        }).catch(error => {
+            alert("Login Failed: " + error.message);
+        });
+    }
+
+    function hideStaffPanel() {
+        document.getElementById("staffPanel").style.display = "none";
+    }
+
+    function addProduct() {
+        const name = document.getElementById("productName").value;
+        const price = document.getElementById("productPrice").value;
+        const category = document.getElementById("productCategory").value;
+        const file = document.getElementById("productImage").files[0];
+        
+        if (name && price && category && file) {
+            const storageRef = storage.ref("products/" + file.name);
+            storageRef.put(file).then(snapshot => {
+                storageRef.getDownloadURL().then(url => {
+                    db.collection("products").add({
+                        name: name,
+                        price: parseFloat(price),
+                        category: category,
+                        imageUrl: url
+                    }).then(() => {
+                        alert("Product Added Successfully!");
+                        loadProducts();
+                    });
+                });
+            });
+        } else {
+            alert("Please fill all fields and select an image!");
+        }
+    }
+
+    function loadOrders() {
+        const orderList = document.getElementById("orderList");
+        orderList.innerHTML = "";
+        db.collection("orders").get().then(snapshot => {
+            snapshot.docs.forEach(doc => {
+                let order = doc.data();
+                orderList.innerHTML += `<p>Order: ${order.product} - ${order.customer} - Status: ${order.status} <button onclick="updateOrderStatus('${doc.id}', 'Shipped')">Ship</button></p>`;
+            });
+        });
+    }
+
+    function updateOrderStatus(orderId, newStatus) {
+        db.collection("orders").doc(orderId).update({ status: newStatus }).then(() => {
+            alert("Order status updated to " + newStatus);
+            loadOrders();
+        });
+    }
 </script>
 
 </body>
